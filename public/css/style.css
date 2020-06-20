@@ -1,0 +1,43 @@
+body {
+  padding: 0;
+  margin: 0;
+  font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #0070FF;
+}
+
+.mainContainer {
+    width: 1200px;
+    margin: 0 auto;
+}
+
+nav {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #2a87ff;
+}
+
+nav ul, nav li { padding: 0; margin: 0; }
+nav ul > li { display: inline-block; }
+nav ul > li > a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 6px;
+}
+nav ul > li > a:hover {
+    background: #2a87ff;
+    color: #fff;
+}
+
+.canvasContainer {
+    text-align: center;
+    padding: 10px;
+}
+
+#canvas {
+    border: 1px solid #ddd;
+}
