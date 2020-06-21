@@ -4,8 +4,30 @@ body {
   font: 16px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+* {
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    -o-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+}
+
+*:hover {
+    -webkit-transition-duration: 0s;
+    -moz-transition-duration: 0s;
+    -o-transition-duration: 0s;
+    transition-duration: 0s;
+}
+
 a {
     color: #0070FF;
+}
+
+a:hover, button:hover, input[type="submit"]:hover {
+    cursor: pointer;
+}
+
+li {
+    list-style: none;
 }
 
 .mainContainer {
@@ -22,15 +44,39 @@ nav {
 
 nav ul, nav li { padding: 0; margin: 0; }
 nav ul > li { display: inline-block; }
-nav ul > li > a {
-    display: block;
+nav ul li > a {
+    display: flex;
+    align-items: center;
     padding: 10px 15px;
     text-decoration: none;
     border-radius: 6px;
 }
-nav ul > li > a:hover {
+
+nav ul li:hover > a,
+nav ul li > a:hover {
     background: #2a87ff;
     color: #fff;
+}
+
+nav ul li > ul {
+    display: none;
+    position: absolute;
+    padding-top: 1em;
+}
+
+nav ul li:hover > ul {
+    display: block;
+}
+
+.dropdownItems {
+    padding: 10px;
+    background: #fff;
+    box-shadow: 1px 17px 20px #b3b3b3;
+    border-radius: 0px 0px 10px 10px;
+}
+
+.dropdownItems > li > a > span:first-child {
+    margin-right: 10px;
 }
 
 .canvasContainer {
@@ -40,4 +86,23 @@ nav ul > li > a:hover {
 
 #canvas {
     border: 1px solid #ddd;
+}
+
+.icon-node {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+}
+
+.node-dest {
+    background: #4fd910;
+}
+
+.node-free {
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+.node-obstacle {
+    background: #000;
 }
