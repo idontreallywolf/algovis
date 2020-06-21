@@ -116,4 +116,16 @@ class Visualizer {
         this.ctx.stroke();
     }
 
+    clear() {
+        for (var i = 0; i < this.nodes.length; i++)
+            for (var j = 0; j < this.nodes[0].length; j++)
+                this.nodes[i][j].makeObstacle(false);
+    }
+
+    generateObstacles() {
+        for (var i = 0; i < this.nodes.length; i++)
+            for (var j = 0; j < this.nodes[0].length; j++)
+                this.nodes[i][j].makeObstacle(Math.random() >= 0.9);
+    }
+
 }
