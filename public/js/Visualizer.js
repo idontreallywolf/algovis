@@ -30,7 +30,6 @@ class Visualizer {
 
     render() {
         this.drawGrid();
-
         window.requestAnimationFrame(() => this.render());
     }
 
@@ -79,7 +78,7 @@ class Visualizer {
 
     drawGrid() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.strokeStyle = "#bebebe";
+        this.ctx.beginPath();
 
         for (var i = 0; i < this.nodes.length; i++) {
             for (var j = 0; j < this.nodes[0].length; j++) {
@@ -88,6 +87,7 @@ class Visualizer {
             }
         }
 
+        this.ctx.strokeStyle = "#bebebe";
         // horizontal
         for (var i = 0; i < this.canvas.height / this.tileSize; i++) {
             this.ctx.moveTo(0, i * this.tileSize);
