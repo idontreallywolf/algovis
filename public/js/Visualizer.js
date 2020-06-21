@@ -7,8 +7,8 @@ class Visualizer {
         @param directed
         @param weighted
     */
-    constructor(canvasId, directed, weighted)
-    {
+    constructor(canvasId, directed, weighted) {
+
         this.canvas = document.getElementById(canvasId);
         this.canvas.width = 1120;
         this.canvas.height = 640;
@@ -20,13 +20,14 @@ class Visualizer {
         this.nodes = [];
         this.tileSize = 16;
 
+        this.handTool = TOOL_FREENODE;
+
         this.canvasEventHandler();
         this.createNodes();
-    }
-
-    update() {
 
     }
+
+    update() { }
 
     render() {
         this.drawGrid();
@@ -46,11 +47,26 @@ class Visualizer {
 
             if(node === undefined)
                 return;
-                
-            if (!node.isObstacle)
-                node.makeObstacle(true);
-        });
 
+            switch(this.handTool) {
+                case TOOL_FREENODE:
+                    if(node.isObstacle)
+                        node.makeObstacle(false);
+                    if(node.isDestination)
+                        node.makeDestination(false);
+                    break;
+
+                case TOOL_OBSTACLE:
+                    if(!node.isObstacle)
+                        node.makeObstacle(true);
+                    break;
+
+                case TOOL_DESTINATION:
+                    if(!node.isDestination)
+                        node.makeDestination(true);
+                    break;
+            }
+        });
 
         this.canvas.addEventListener('click', (event) => { });
     }
@@ -70,8 +86,7 @@ class Visualizer {
         @param directed
         @param weighted
     */
-    createNodes()
-    {
+    createNodes() {
         for (let i = 0; i < this.canvas.clientHeight / this.tileSize; i++) {
             let row = []
             for (let j = 0; j < this.canvas.clientWidth / this.tileSize; j++) {
@@ -126,6 +141,10 @@ class Visualizer {
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++)
                 this.nodes[i][j].makeObstacle(Math.random() >= 0.9);
+    }
+
+    setHandTool(tool) {
+        this.handTool = tool;
     }
 
 }

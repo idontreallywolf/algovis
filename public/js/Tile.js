@@ -10,7 +10,8 @@ class Tile {
         this.width = width;
         this.height = height;
         this.isObstacle = isObstacle;
-        this.bg = (isObstacle ? "#000":"#fff");
+        this.isDestination = false;
+        this.bg = (isObstacle ? NODE_COLOR_OBSTACLE : NODE_COLOR_EMPTY);
     }
 
     /**
@@ -18,7 +19,23 @@ class Tile {
     */
     makeObstacle(bool) {
         this.isObstacle = bool;
-        this.setBackground(bool ? "#000":"#fff");
+        this.setBackground(bool ? NODE_COLOR_OBSTACLE : NODE_COLOR_EMPTY);
+    }
+
+    makeDestination(bool) {
+        if(!bool) {
+            if(this.isDestination)
+                this.isDestination = false;
+
+            this.setBackground(NODE_COLOR_EMPTY);
+            return;
+        }
+
+        if(this.isObstacle)
+            this.makeObstacle(false);
+            
+        this.isDestination = true;
+        this.setBackground(NODE_COLOR_DESTINATION);
     }
 
     setBackground(newBg) {
