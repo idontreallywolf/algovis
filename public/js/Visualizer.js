@@ -41,11 +41,12 @@ class Visualizer {
         this.canvas.addEventListener('mousemove', (event) => {
             if(!this.mouseDown)
                 return;
-                
+
             let node = this.getNodeByMousePos(event);
 
             if(node === undefined)
-            return;
+                return;
+                
             if (!node.isObstacle)
                 node.makeObstacle(true);
         });
