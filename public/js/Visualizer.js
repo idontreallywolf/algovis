@@ -39,10 +39,15 @@ class Visualizer {
         this.canvas.addEventListener('mouseup',   (event) => { this.mouseDown = false; });
 
         this.canvas.addEventListener('mousemove', (event) => {
+            if(!this.mouseDown)
+                return;
+                
             let node = this.getNodeByMousePos(event);
-            if(this.mouseDown)
-                if (!node.isObstacle)
-                    node.makeObstacle(true);
+
+            if(node === undefined)
+            return;
+            if (!node.isObstacle)
+                node.makeObstacle(true);
         });
 
 
@@ -52,6 +57,8 @@ class Visualizer {
     getNodeByMousePos(event) {
         let x = Math.floor(event.offsetX / this.tileSize);
         let y = Math.floor(event.offsetY / this.tileSize);
+        if (this.nodes[y] === undefined)
+            return;
         return this.nodes[y][x];
     }
 
