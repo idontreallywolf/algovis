@@ -18,7 +18,7 @@ class Visualizer {
         this.mouseDown  = false;
 
         this.nodes = [];
-        this.tileSize = 32;
+        this.tileSize = 16;
 
         this.canvasEventHandler();
         this.createNodes();
