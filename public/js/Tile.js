@@ -9,11 +9,41 @@ class Tile {
         this.id = id;
         this.width = TILESIZE;
         this.height = TILESIZE;
+
         this.x = x;
         this.y = y;
+
+        this.gridPos = {
+            x: x * TILESIZE,
+            y: y * TILESIZE
+        };
+
         this.isObstacle = isObstacle;
         this.isDestination = false;
         this.bg = (isObstacle ? NODE_COLOR_OBSTACLE : NODE_COLOR_EMPTY);
+    }
+
+    drawEdges(ctx) {
+        ctx.beginPath();
+
+        // left
+        ctx.moveTo(this.gridPos.x, this.gridPos.y);
+        ctx.lineTo(this.gridPos.x, this.gridPos.y + this.height);
+
+        // right
+        ctx.moveTo(this.gridPos.x + this.width, this.gridPos.y);
+        ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y + this.height);
+
+        // top
+        ctx.moveTo(this.gridPos.x, this.gridPos.y);
+        ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y);
+
+        // bottom
+        ctx.moveTo(this.gridPos.x, this.gridPos.y + this.height);
+        ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y + this.height);
+
+        ctx.strokeStyle = "#ffa801";
+        ctx.stroke();
     }
 
     /**

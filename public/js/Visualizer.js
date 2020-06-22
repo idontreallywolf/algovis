@@ -115,6 +115,8 @@ class Visualizer {
 
                     newNode.x = node.x;
                     newNode.y = node.y;
+                    newNode.gridPos.x = node.gridPos.x;
+                    newNode.gridPos.y = node.gridPos.y;
 
                     this.nodes[node.y][node.x] = newNode;
                 } break;
@@ -162,37 +164,19 @@ class Visualizer {
             for (var j = 0; j < this.nodes[0].length; j++) {
                 this.ctx.fillStyle = this.nodes[i][j].bg;
                 this.ctx.fillRect(j * TILESIZE, i * TILESIZE, TILESIZE, TILESIZE)
+                this.nodes[i][j].drawEdges(this.ctx);
             }
         }
-
-        this.ctx.strokeStyle = "#bebebe";
-        // horizontal
-        for (var i = 0; i < Math.floor(this.canvas.height / TILESIZE); i++) {
-            this.ctx.moveTo(0, i * TILESIZE);
-            this.ctx.lineTo(this.canvas.clientWidth, i * TILESIZE);
-        }
-
-        // vertical
-        for (var i = 0; i < Math.floor(this.canvas.width / TILESIZE); i++) {
-            this.ctx.moveTo(i * TILESIZE, 0);
-            this.ctx.lineTo(i * TILESIZE, this.canvas.clientHeight);
-        }
-
-        this.ctx.moveTo(this.canvas.width, 0);
-        this.ctx.lineTo(this.canvas.width, this.canvas.height);
-        this.ctx.moveTo(0, this.canvas.height);
-        this.ctx.lineTo(this.canvas.width, this.canvas.height);
-        this.ctx.stroke();
 
         this.ctx.beginPath();
         this.ctx.lineWidth = 5;
         if(this.selectedNode !== null) {
             this.ctx.strokeStyle = NODE_COLOR_HIGHLIGHT;
-            this.ctx.rect(this.selectedNode.x * TILESIZE, this.selectedNode.y * TILESIZE, TILESIZE, TILESIZE);
+            this.ctx.rect(this.selectedNode.gridPos.x, this.selectedNode.gridPos.y, TILESIZE, TILESIZE);
         }
         if(this.previousNode !== null) {
             this.ctx.strokeStyle = NODE_COLOR_HIGHLIGHT;
-            this.ctx.rect(this.previousNode.x * TILESIZE, this.previousNode.y * TILESIZE, TILESIZE, TILESIZE);
+            this.ctx.rect(this.previousNode.gridPos.x, this.previousNode.gridPos.y, TILESIZE, TILESIZE);
         }
         this.ctx.stroke();
     }
