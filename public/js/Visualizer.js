@@ -23,6 +23,9 @@ class Visualizer {
 
         this.lastNodeId = 1;
 
+        this.targets = 0;
+        this.maxTargets = 2;
+
         this.canvasEventHandler();
         this.createNodes();
 
@@ -96,8 +99,10 @@ class Visualizer {
 
                 case TOOL_DESTINATION:
                 {
-                    if(!node.isDestination)
+                    if(!node.isDestination && this.targets < this.maxTargets) {
                         node.makeDestination(true);
+                        this.targets++;
+                    }
                 } break;
 
                 case TOOL_MOVENODE:
