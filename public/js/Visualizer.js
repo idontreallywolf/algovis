@@ -83,29 +83,20 @@ class Visualizer {
 
             switch(this.handTool) {
                 case TOOL_EMPTYNODE:
-                {
-                    if(node.isObstacle)
-                        node.makeObstacle(false);
-
-                    if(node.isDestination)
-                        node.makeDestination(false);
-
+                    if(node.isObstacle)    node.makeObstacle(false);
+                    if(node.isDestination) node.makeDestination(false);
                     break;
-                }
 
                 case TOOL_OBSTACLE:
-                {
-                    if(!node.isObstacle)
-                        node.makeObstacle(true);
-                } break;
+                    if(!node.isObstacle) node.makeObstacle(true);
+                    break;
 
                 case TOOL_DESTINATION:
-                {
                     if(!node.isDestination && this.targets < this.maxTargets) {
                         node.makeDestination(true);
                         this.targets++;
                     }
-                } break;
+                    break;
 
                 case TOOL_MOVENODE:
                 {
@@ -130,10 +121,7 @@ class Visualizer {
             }
         });
 
-        this.canvas.addEventListener('click', (event) => {
-            let node = this.getNodeByMousePos(event);
-            console.log(node);
-        });
+        this.canvas.addEventListener('click', (event) => {});
     }
 
     getNodeByMousePos(event) {
@@ -154,9 +142,10 @@ class Visualizer {
     createNodes() {
         for (let i = 0; i < Math.floor(this.canvas.clientHeight / TILESIZE); i++) {
             let row = []
-            for (let j = 0; j < this.canvas.clientWidth / TILESIZE; j++) {
+
+            for (let j = 0; j < this.canvas.clientWidth / TILESIZE; j++)
                 row.push(new Tile(++this.lastNodeId, j, i, Math.random() >= 0.9));
-            }
+
             this.nodes.push(row);
         }
 
