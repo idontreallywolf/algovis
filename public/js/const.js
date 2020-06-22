@@ -1,6 +1,7 @@
 const NODE_COLOR_OBSTACLE    = "#000";
 const NODE_COLOR_EMPTY       = "#fff";
 const NODE_COLOR_DESTINATION = "#0f0";
+const NODE_COLOR_HIGHLIGHT   = "#f00";
 
 // handTool
 const TOOL_EMPTYNODE    = 0;

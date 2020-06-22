@@ -160,6 +160,7 @@ class Visualizer {
     drawGrid() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.beginPath();
+        this.ctx.lineWidth = 1;
 
         for (var i = 0; i < this.nodes.length; i++) {
             for (var j = 0; j < this.nodes[0].length; j++) {
@@ -185,7 +186,18 @@ class Visualizer {
         this.ctx.lineTo(this.canvas.width, this.canvas.height);
         this.ctx.moveTo(0, this.canvas.height);
         this.ctx.lineTo(this.canvas.width, this.canvas.height);
+        this.ctx.stroke();
 
+        this.ctx.beginPath();
+        this.ctx.lineWidth = 5;
+        if(this.selectedNode !== null) {
+            this.ctx.strokeStyle = NODE_COLOR_HIGHLIGHT;
+            this.ctx.rect(this.selectedNode.x * TILESIZE, this.selectedNode.y * TILESIZE, TILESIZE, TILESIZE);
+        }
+        if(this.previousNode !== null) {
+            this.ctx.strokeStyle = NODE_COLOR_HIGHLIGHT;
+            this.ctx.rect(this.previousNode.x * TILESIZE, this.previousNode.y * TILESIZE, TILESIZE, TILESIZE);
+        }
         this.ctx.stroke();
     }
 
