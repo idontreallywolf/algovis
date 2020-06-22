@@ -1,6 +1,3 @@
-/*
-    TODO: lagg when calling requestAnimationFrame
-*/
 class Visualizer {
     /**
         @param canvasId
@@ -18,9 +15,13 @@ class Visualizer {
         this.mouseDown  = false;
 
         this.nodes = [];
-        this.tileSize = 16;
 
-        this.handTool = TOOL_FREENODE;
+        this.handTool = TOOL_EMPTYNODE;
+
+        this.selectedNode = null;
+        this.previousNode = null;
+
+        this.lastNodeId = 1;
 
         this.canvasEventHandler();
         this.createNodes();
@@ -35,9 +36,36 @@ class Visualizer {
     }
 
     canvasEventHandler() {
-        this.canvas.addEventListener('click',     (event) => {});
-        this.canvas.addEventListener('mousedown', (event) => { this.mouseDown = true;  });
-        this.canvas.addEventListener('mouseup',   (event) => { this.mouseDown = false; });
+        this.canvas.addEventListener('mousedown', (event) => {
+            this.mouseDown = true;
+
+            if(this.handTool == TOOL_MOVENODE) {
+                let node = this.getNodeByMousePos(event);
+
+                if(node === undefined)
+                    return;
+
+                // do not move empty nodes
+                if(node.isEmpty())
+                    return;
+
+                this.selectedNode = node;
+            }
+
+        });
+
+        this.canvas.addEventListener('mouseup',   (event) => {
+            this.mouseDown = false;
+
+            if(this.selectedNode == null)
+                return;
+
+            if(this.handTool == TOOL_MOVENODE) {
+                this.clearNode(this.selectedNode);
+                this.selectedNode = null;
+                this.previousNode = null;
+            }
+        });
 
         this.canvas.addEventListener('mousemove', (event) => {
             if(!this.mouseDown)
@@ -49,31 +77,61 @@ class Visualizer {
                 return;
 
             switch(this.handTool) {
-                case TOOL_FREENODE:
+                case TOOL_EMPTYNODE:
+                {
                     if(node.isObstacle)
                         node.makeObstacle(false);
+
                     if(node.isDestination)
                         node.makeDestination(false);
+
                     break;
+                }
 
                 case TOOL_OBSTACLE:
+                {
                     if(!node.isObstacle)
                         node.makeObstacle(true);
-                    break;
+                } break;
 
                 case TOOL_DESTINATION:
+                {
                     if(!node.isDestination)
                         node.makeDestination(true);
-                    break;
+                } break;
+
+                case TOOL_MOVENODE:
+                {
+                    if(this.selectedNode == null
+                    || this.selectedNode.equalTo(node))
+                        break;
+
+                    // restore previous node & save current node
+                    if(this.previousNode !== null)
+                        this.restoreNode(this.previousNode);
+
+                    this.previousNode = node;
+
+                    // clone selectedNode & modify x,y to match current node
+                    let newNode = _.clone(this.selectedNode, true);
+
+                    newNode.x = node.x;
+                    newNode.y = node.y;
+
+                    this.nodes[node.y][node.x] = newNode;
+                } break;
             }
         });
 
-        this.canvas.addEventListener('click', (event) => { });
+        this.canvas.addEventListener('click', (event) => {
+            let node = this.getNodeByMousePos(event);
+            console.log(node);
+        });
     }
 
     getNodeByMousePos(event) {
-        let x = Math.floor(event.offsetX / this.tileSize);
-        let y = Math.floor(event.offsetY / this.tileSize);
+        let x = Math.floor(event.offsetX / TILESIZE);
+        let y = Math.floor(event.offsetY / TILESIZE);
         if (this.nodes[y] === undefined)
             return;
         return this.nodes[y][x];
@@ -87,10 +145,10 @@ class Visualizer {
         @param weighted
     */
     createNodes() {
-        for (let i = 0; i < this.canvas.clientHeight / this.tileSize; i++) {
+        for (let i = 0; i < Math.floor(this.canvas.clientHeight / TILESIZE); i++) {
             let row = []
-            for (let j = 0; j < this.canvas.clientWidth / this.tileSize; j++) {
-                row.push(new Tile(this.tileSize, this.tileSize, Math.random() >= 0.9));
+            for (let j = 0; j < this.canvas.clientWidth / TILESIZE; j++) {
+                row.push(new Tile(++this.lastNodeId, j, i, Math.random() >= 0.9));
             }
             this.nodes.push(row);
         }
@@ -106,21 +164,21 @@ class Visualizer {
         for (var i = 0; i < this.nodes.length; i++) {
             for (var j = 0; j < this.nodes[0].length; j++) {
                 this.ctx.fillStyle = this.nodes[i][j].bg;
-                this.ctx.fillRect(j * this.tileSize, i * this.tileSize, this.tileSize, this.tileSize)
+                this.ctx.fillRect(j * TILESIZE, i * TILESIZE, TILESIZE, TILESIZE)
             }
         }
 
         this.ctx.strokeStyle = "#bebebe";
         // horizontal
-        for (var i = 0; i < this.canvas.height / this.tileSize; i++) {
-            this.ctx.moveTo(0, i * this.tileSize);
-            this.ctx.lineTo(this.canvas.clientWidth, i * this.tileSize);
+        for (var i = 0; i < Math.floor(this.canvas.height / TILESIZE); i++) {
+            this.ctx.moveTo(0, i * TILESIZE);
+            this.ctx.lineTo(this.canvas.clientWidth, i * TILESIZE);
         }
 
         // vertical
-        for (var i = 0; i < this.canvas.width / this.tileSize; i++) {
-            this.ctx.moveTo(i * this.tileSize, 0);
-            this.ctx.lineTo(i * this.tileSize, this.canvas.clientHeight);
+        for (var i = 0; i < Math.floor(this.canvas.width / TILESIZE); i++) {
+            this.ctx.moveTo(i * TILESIZE, 0);
+            this.ctx.lineTo(i * TILESIZE, this.canvas.clientHeight);
         }
 
         this.ctx.moveTo(this.canvas.width, 0);
@@ -145,6 +203,20 @@ class Visualizer {
 
     setHandTool(tool) {
         this.handTool = tool;
+    }
+
+    clearNode(n) {
+        this.nodes[n.y][n.x] = new Tile(++this.lastNodeId, n.x, n.y, false);
+    }
+
+    restoreNode(n) {
+        let node = new Tile(++this.lastNodeId, n.x, n.y, false);
+
+        node.isObstacle = n.isObstacle;
+        node.isDestination = n.isDestination;
+        node.bg = n.bg;
+
+        this.nodes[n.y][n.x] = node;
     }
 
 }

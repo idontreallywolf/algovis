@@ -1,14 +1,16 @@
 class Tile {
     /**
-        @param {Number} width
-        @param {Number} height
+        @param {Number} size
         @param {Number} x
         @param {Number} y
         @param {bool}   isObstacle
     */
-    constructor(width, height, isObstacle) {
-        this.width = width;
-        this.height = height;
+    constructor(id, x, y, isObstacle) {
+        this.id = id;
+        this.width = TILESIZE;
+        this.height = TILESIZE;
+        this.x = x;
+        this.y = y;
         this.isObstacle = isObstacle;
         this.isDestination = false;
         this.bg = (isObstacle ? NODE_COLOR_OBSTACLE : NODE_COLOR_EMPTY);
@@ -38,7 +40,25 @@ class Tile {
         this.setBackground(NODE_COLOR_DESTINATION);
     }
 
+    makeEmpty() {
+        if(this.isDestination)
+            this.isDestination = false;
+
+        if(this.isObstacle)
+            this.isObstacle = false;
+
+        this.setBackground(NODE_COLOR_EMPTY);
+    }
+
+    isEmpty() {
+        return !this.isObstacle && !this.isDestination;
+    }
+
     setBackground(newBg) {
         this.bg = newBg;
+    }
+
+    equalTo(otherNode) {
+        return (this.id == otherNode.id);
     }
 }
