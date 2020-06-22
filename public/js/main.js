@@ -11,6 +11,6 @@ window.addEventListener('load', () => {
 
     $('#tool_dest').click(() =>       { visualizer.setHandTool(TOOL_DESTINATION);   });
     $('#tool_obstacle').click(() =>   { visualizer.setHandTool(TOOL_OBSTACLE);      });
-    $('#tool_emptynode').click(() =>  { visualizer.setHandTool(TOOL_FREENODE);      });
+    $('#tool_emptynode').click(() =>  { visualizer.setHandTool(TOOL_EMPTYNODE);     });
     $('#tool_movenode').click(() =>   { visualizer.setHandTool(TOOL_MOVENODE);      });
 });
