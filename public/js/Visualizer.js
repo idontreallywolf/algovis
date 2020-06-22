@@ -57,7 +57,7 @@ class Visualizer {
 
         });
 
-        this.canvas.addEventListener('mouseup',   (event) => {
+        this.canvas.addEventListener('mouseup', (event) => {
             this.mouseDown = false;
 
             if(this.selectedNode == null)
