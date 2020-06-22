@@ -64,7 +64,9 @@ class Visualizer {
                 return;
 
             if(this.handTool == TOOL_MOVENODE) {
-                this.clearNode(this.selectedNode);
+                if(this.previousNode != null)
+                    this.clearNode(this.selectedNode);
+                    
                 this.selectedNode = null;
                 this.previousNode = null;
             }
