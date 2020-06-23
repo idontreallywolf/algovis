@@ -127,8 +127,69 @@ class MazeGenerator {
     }
 
     isWallUsed(callerNode, node) {
+
+        let nextX = 0;
+        let nextY = 0;
+        let xSame = false;
+        let ySame = false;
+
+        // check +1 in the direction we're heading
+        if(callerNode.x < node.x) {         // going right
+            nextX = 1;
+        } else if(callerNode.x > node.x) {  // going left
+            nextX = -1;
+        } else {
+            xSame = true;
+        }
+
+        if(callerNode.y < node.y) {         // going down
+            nextY = 1;
+        } else if(callerNode.y > node.y) {  // going up
+            nextY = -1;
+        } else {
+            ySame = true;
+        }
+
+        if(xSame) {
+            if((nextY > 0 && (node.y + nextY > this.nodes.length-1))
+            || (nextY < 0 && (node.y + nextY < 0)))
+                nextY = 0;
+
+            if(node.x > 0)
+                if(this.nodes[node.y + nextY][node.x - 1].isVisited())
+                    return true;
+
+            if(node.x < this.nodes[0].length-1)
+                if(this.nodes[node.y + nextY][node.x + 1].isVisited())
+                    return true;
+
+        } else if (ySame) {
+            if((nextX > 0 && (node.x + nextX > this.nodes[0].length-1))
+            || (nextX < 0 && (node.x + nextX < 0)))
+                nextX = 0;
+
+            if(node.y > 0)
+                if(this.nodes[node.y - 1][node.x + nextX].isVisited())
+                    return true
+
+            if(node.y < this.nodes.length-1)
+                if(this.nodes[node.y + 1][node.x + nextX].isVisited())
+                    return true;
+        }
+
+        // if 2nd cell from our point towards current direction is visited
+        // then we should not "break" the wall.
+        //     <-
+        // [ ][#][X]
+        if(this.nodes[node.y + nextY][node.x + nextX].isVisited()) {
+            return true;
+        }
+
+        // if there's no visited cell in the direction
+        // scan for edges & corners
         let dy = [-1, 1,  0, 0];
         let dx = [ 0, 0, -1, 1];
+        let adjacentPaths = 0;
 
         for (var i = 0; i < dy.length; i++) {
 
@@ -140,10 +201,12 @@ class MazeGenerator {
 
             let tempNode = this.nodes[node.y + dy[i]][node.x + dx[i]];
 
-            if(tempNode.isVisited() && !callerNode.equalTo(tempNode)) {
-                return true;
-            }
+            if(tempNode.isVisited())
+                adjacentPaths++;
         }
+
+        if(adjacentPaths > 1)
+            return true;
 
         return false;
     }
