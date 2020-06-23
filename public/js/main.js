@@ -13,4 +13,7 @@ window.addEventListener('load', () => {
     $('#tool_obstacle').click(() =>   { visualizer.setHandTool(TOOL_OBSTACLE);      });
     $('#tool_emptynode').click(() =>  { visualizer.setHandTool(TOOL_EMPTYNODE);     });
     $('#tool_movenode').click(() =>   { visualizer.setHandTool(TOOL_MOVENODE);      });
+
+    $('#mazegen_standard').click(() => { visualizer.generateMaze(MAZE_STANDARD); });
+    $('#mazegen_block').click(()    => { visualizer.generateMaze(MAZE_BLOCK);    });
 });

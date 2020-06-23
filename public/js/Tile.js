@@ -35,6 +35,8 @@ class Tile {
             bottom: true,
             right: true
         }
+
+        this.visited = false;
     }
 
     /**
@@ -44,23 +46,23 @@ class Tile {
     drawEdges(ctx) {
         ctx.beginPath();
 
-        // left
-        ctx.moveTo(this.gridPos.x, this.gridPos.y);
-        ctx.lineTo(this.gridPos.x, this.gridPos.y + this.height);
+        if(this.edges.left) {
+            ctx.moveTo(this.gridPos.x, this.gridPos.y);
+            ctx.lineTo(this.gridPos.x, this.gridPos.y + this.height);
+        } else if(this.edges.right) {
+            ctx.moveTo(this.gridPos.x + this.width, this.gridPos.y);
+            ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y + this.height);
+        }
 
-        // right
-        ctx.moveTo(this.gridPos.x + this.width, this.gridPos.y);
-        ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y + this.height);
+        if(this.edges.top) {
+            ctx.moveTo(this.gridPos.x, this.gridPos.y);
+            ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y);
+        } else if(this.edges.bottom) {
+            ctx.moveTo(this.gridPos.x, this.gridPos.y + this.height);
+            ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y + this.height);
+        }
 
-        // top
-        ctx.moveTo(this.gridPos.x, this.gridPos.y);
-        ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y);
-
-        // bottom
-        ctx.moveTo(this.gridPos.x, this.gridPos.y + this.height);
-        ctx.lineTo(this.gridPos.x + this.width, this.gridPos.y + this.height);
-
-        ctx.strokeStyle = "#ffa801";
+        ctx.strokeStyle = "#000";
         ctx.stroke();
     }
 
@@ -127,5 +129,28 @@ class Tile {
     */
     equalTo(otherNode) {
         return (this.id == otherNode.id);
+    }
+
+    isVisited() {
+        if(this.visited)
+            return true;
+
+        return false;
+    }
+
+    setVisited(bool) {
+        if(bool) {
+            this.visited = true;
+            return;
+        }
+
+        this.visited = false;
+    }
+
+    resetEdges() {
+        this.edges.top    = true;
+        this.edges.left   = true;
+        this.edges.bottom = true;
+        this.edges.right  = true;
     }
 }

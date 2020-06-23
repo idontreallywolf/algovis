@@ -5,9 +5,11 @@
     <link rel="stylesheet" href="/css/style.css"/>
     <script src="/js/lodash.js" charset="utf-8"></script>
     <script src="/js/const.js" charset="utf-8"></script>
+    <script src="/js/tile.js" charset="utf-8"></script>
+
+    <script src="/js/MazeGenerator.js" charset="utf-8"></script>
     <script src="/js/Visualizer.js" charset="utf-8"></script>
     <script src="/js/jq351.js" charset="utf-8"></script>
-    <script src="/js/tile.js" charset="utf-8"></script>
     <script src="/js/dfs.js" charset="utf-8"></script>
     <script src="/js/main.js" charset="utf-8"></script>
   </head>
@@ -15,12 +17,12 @@
     <div class="mainContainer">
         <nav>
             <ul>
-                <li><a href="#">Test</a> </li>
-                <li><a href="#">test</a> </li>
-                <li><a href="#">test</a> </li>
+                <li><a id="mazegen_standard">Standard Maze</a></li>
+                <li><a id="mazegen_block">Block Maze</a></li>
+                <li><a href="#">test</a></li>
             </ul>
             <ul>
-                <li><a id="toolKit" class="dropdown">ToolKit V</a>
+                <li><a id="toolKit" class="dropdown"><span>Tool</span> <span class="icon-node node-free"></span></a>
                     <ul class="list">
                         <div class="dropdownItems">
                             <li><a id="tool_dest"><span class="icon-node node-dest"></span><span>Destination</span></a></li>

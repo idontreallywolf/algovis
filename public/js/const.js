@@ -15,3 +15,7 @@ const NODE_OBSTACLE     = 1;
 const NODE_DESTINATION  = 2;
 
 const TILESIZE = 32;
+
+// Maze types
+const MAZE_STANDARD = 0;
+const MAZE_BLOCK    = 1;

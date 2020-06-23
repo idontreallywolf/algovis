@@ -66,7 +66,7 @@ class Visualizer {
             if(this.handTool == TOOL_MOVENODE) {
                 if(this.previousNode != null)
                     this.clearNode(this.selectedNode);
-                    
+
                 this.selectedNode = null;
                 this.previousNode = null;
             }
@@ -145,7 +145,7 @@ class Visualizer {
         for (let i = 0; i < Math.floor(this.canvas.clientHeight / TILESIZE); i++) {
             let row = []
 
-            for (let j = 0; j < this.canvas.clientWidth / TILESIZE; j++)
+            for (let j = 0; j < Math.floor(this.canvas.clientWidth / TILESIZE); j++)
                 row.push(new Tile(++this.lastNodeId, j, i, Math.random() >= 0.9));
 
             this.nodes.push(row);
@@ -183,14 +183,34 @@ class Visualizer {
 
     clear() {
         for (var i = 0; i < this.nodes.length; i++)
-            for (var j = 0; j < this.nodes[0].length; j++)
+            for (var j = 0; j < this.nodes[0].length; j++) {
                 this.nodes[i][j].makeObstacle(false);
+                this.nodes[i][j].setVisited(false);
+                this.nodes[i][j].resetEdges();
+            }
     }
 
     generateObstacles() {
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++)
                 this.nodes[i][j].makeObstacle(Math.random() >= 0.9);
+    }
+
+    fillWithObstacles() {
+        for (var i = 0; i < this.nodes.length; i++)
+            for (var j = 0; j < this.nodes[0].length; j++) {
+                this.nodes[i][j].makeObstacle(true);
+                this.nodes[i][j].setVisited(false);
+                this.nodes[i][j].resetEdges();
+            }
+    }
+
+    generateMaze(type) {
+        this.clear();
+        if(type == MAZE_BLOCK)
+            this.fillWithObstacles();
+
+        this.nodes = new MazeGenerator(this.nodes, type).nodes;
     }
 
     setHandTool(tool) {
