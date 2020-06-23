@@ -78,7 +78,6 @@ class MazeGenerator {
                 node.y + dy[i] > this.nodes.length-1))
                 continue;
 
-            console.log(i);
             let tempNode = this.nodes[node.y + dy[i]][node.x + dx[i]];
 
             // save available nodes
@@ -115,7 +114,6 @@ class MazeGenerator {
         node.makeEmpty();
 
         let nextNode = this.findUnvisitedNode(node, true);
-        console.log(nextNode);
         if(nextNode == null) return false;
 
         // create next path
