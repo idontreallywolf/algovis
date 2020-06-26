@@ -27,6 +27,8 @@ class Visualizer {
         this.maxTargets = 2;
         this.targetPoints = [];
 
+        this.pathStack = [];
+
         this.canvasEventHandler();
         this.createNodes();
 
@@ -189,7 +191,7 @@ class Visualizer {
 
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++) {
-                this.nodes[i][j].makeObstacle(false);
+                this.nodes[i][j].makeEmpty();
                 this.nodes[i][j].setVisited(false);
                 this.nodes[i][j].resetEdges();
             }
@@ -215,7 +217,26 @@ class Visualizer {
         if(type == MAZE_BLOCK)
             this.fillWithObstacles();
 
-        this.nodes = new MazeGenerator(this.nodes, type).nodes;
+        new MazeGenerator(this.nodes, type);
+    }
+
+    findPath(type) {
+        this.freeVisitedPaths();
+
+        let pf = new PathFinder(this.nodes, this.pathStack);
+        pf.depthFirstSearch(this.targetPoints[0]);
+        
+        if(this.pathStack == false) {
+            console.log("no path");
+            return;
+        }
+
+        for (var i = 0; i < this.pathStack.length; i++) {
+            let node = this.pathStack[i];
+            node.setBackground(NODE_COLOR_PATH);
+        }
+
+        this.pathStack = [];
     }
 
     setHandTool(tool) {
@@ -232,8 +253,18 @@ class Visualizer {
         node.isObstacle = n.isObstacle;
         node.isDestination = n.isDestination;
         node.bg = n.bg;
+        node.edges = n.edges;
 
         this.nodes[n.y][n.x] = node;
     }
 
+    freeVisitedPaths() {
+        for (var i = 0; i < this.nodes.length; i++)
+            for (var j = 0; j < this.nodes[0].length; j++) {
+                if(this.nodes[i][j].isEmpty() || this.nodes[i][j].isDestination)
+                    this.nodes[i][j].setVisited(false);
+                if(this.nodes[i][j].isObstacle)
+                    this.nodes[i][j].setVisited(true);
+            }
+    }
 }
