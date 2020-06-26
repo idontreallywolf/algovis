@@ -25,6 +25,7 @@ class Visualizer {
 
         this.targets = 0;
         this.maxTargets = 2;
+        this.targetPoints = [];
 
         this.canvasEventHandler();
         this.createNodes();
@@ -94,6 +95,7 @@ class Visualizer {
                 case TOOL_DESTINATION:
                     if(!node.isDestination && this.targets < this.maxTargets) {
                         node.makeDestination(true);
+                        this.targetPoints.push(node);
                         this.targets++;
                     }
                     break;
@@ -182,6 +184,9 @@ class Visualizer {
     }
 
     clear() {
+        this.targetPoints = [];
+        this.targets = 0;
+
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++) {
                 this.nodes[i][j].makeObstacle(false);
