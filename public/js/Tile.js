@@ -155,4 +155,16 @@ class Tile {
         this.edges.bottom = true;
         this.edges.right  = true;
     }
+
+    hasParent() {
+        return this.parentNode != null;
+    }
+
+    getParent() {
+        return this.parentNode;
+    }
+
+    setParent(n) {
+        this.parentNode = n;
+    }
 }

@@ -131,7 +131,9 @@ class Visualizer {
             }
         });
 
-        this.canvas.addEventListener('click', (event) => {});
+        this.canvas.addEventListener('click', (event) => {
+            console.log(this.getNodeByMousePos(event));
+        });
     }
 
     getNodeByMousePos(event) {
@@ -196,9 +198,11 @@ class Visualizer {
 
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++) {
-                this.nodes[i][j].makeEmpty();
-                this.nodes[i][j].setVisited(false);
-                this.nodes[i][j].resetEdges();
+                let n = this.nodes[i][j];
+                n.makeEmpty();
+                n.setVisited(false);
+                n.resetEdges();
+                n.setParent(null);
             }
     }
 
@@ -226,10 +230,12 @@ class Visualizer {
         new MazeGenerator(this.nodes, type);
     }
 
-    findPath(type) {
+    findPath(algorithm) {
         this.freeVisitedPaths();
 
         let pf = new PathFinder(this.nodes, this.pathStack);
+        // pf.breadthFirstSearch(this.targetPoints[0], this.currentMaze);
+        // console.log("finished");
         pf.depthFirstSearch(this.targetPoints[0], this.currentMaze);
 
         if(this.pathStack == false) {

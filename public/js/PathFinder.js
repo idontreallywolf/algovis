@@ -2,6 +2,7 @@ class PathFinder {
     constructor(nodes, stack) {
         this.nodes = nodes;
         this.stack = stack;
+        this.queue = [];
     }
 
     depthFirstSearch(node, mazeType) {
@@ -10,7 +11,8 @@ class PathFinder {
 
         if(nextNode == null) {
             let n = this.stack.pop();
-            n.setBackground(NODE_COLOR_HIGHLIGHT);
+            if(n !== undefined)
+                n.setBackground(NODE_COLOR_HIGHLIGHT);
             node.setBackground(NODE_COLOR_HIGHLIGHT)
             return false;
         }
@@ -27,7 +29,7 @@ class PathFinder {
         }
     }
 
-    findUnvisitedNode(node, mazeType) {
+    findUnvisitedNode(node, mazeType = MAZE_BLOCK, returnAll = false) {
         let dy = [-1, 1,  0, 0];
         let dx = [ 0, 0, -1, 1];
 
@@ -43,10 +45,8 @@ class PathFinder {
             let tempNode = this.nodes[node.y + dy[i]][node.x + dx[i]];
 
             if(tempNode.isVisited() == false) {
-                if(mazeType == MAZE_BLOCK) {
+                if(mazeType != MAZE_STANDARD)
                     freeNodes.push(tempNode);
-                    continue;
-                }
 
                 if(mazeType == MAZE_STANDARD) {
                     if(tempNode.y < node.y) {
@@ -84,48 +84,58 @@ class PathFinder {
         if (freeNodes.length == 0)
             return null;
 
+        if(returnAll)
+            return freeNodes;
+
         let index = Math.floor(Math.random() * freeNodes.length);
         return freeNodes[index];
     }
 
-    testFindUnvisitedNode() {
-        let grid = [
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 1, 0, 0],
-            [0, 0, 1, 0, 1, 0, 0],
-            [0, 0, 1, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-        ]
+    breadthFirstSearch(node, mazeType) {
+        let backtrackNode = null;
+        this.queue.push(node);
+        let childNodes = null;
 
-        let x = 3;
-        let y = 3;
-        let node = grid[y][x];
+        while(this.queue.length > 0) {
+            node = this.queue[0];
+            node.setVisited(true);
 
-        let dy = [-1, 1,  0, 0];
-        let dx = [ 0, 0, -1, 1];
+            childNodes = this.findUnvisitedNode(node, mazeType, true);
 
-        let freeNodes = [];
-
-        for (var i = 0; i < dy.length; i++) {
-            if((x + dx[i] < 0 || x + dx[i] > grid[0].length-1)
-            || (y + dy[i] < 0 || y + dy[i] > grid.length-1))
+            if(childNodes == null) {
+                this.queue.shift();
                 continue;
+            }
 
-            if(grid[y+dy[i]][x+dx[i]] == 0)
-                freeNodes.push({x: x+dx[i], y: y+dy[i]});
+            for (var i = 0; i < childNodes.length; i++) {
+                if(childNodes[i].hasParent() == false) {
+                    childNodes[i].setParent(node);
+
+                    if (childNodes[i].isDestination) {
+                        backtrackNode = childNodes[i];
+                        break;
+                    }
+
+                    this.queue.push(childNodes[i]);
+                }
+            }
+
+            // destination node found, exit loop.
+            if(backtrackNode != null)
+                break;
+
+            this.queue.shift();
         }
 
-        if (freeNodes.length == 0) {
-            return null;
+        if(backtrackNode != null) {
+            let parentNode = backtrackNode.getParent();
+            while(parentNode != null) {
+                parentNode.setBackground(NODE_COLOR_PATH);
+                parentNode = parentNode.getParent();
+            }
         }
-
-        let index = Math.floor(Math.random() * freeNodes.length);
-        return freeNodes[index];
     }
 
-    breadthFirstSearch() {}
     aStarSearch() {}
     dijkstraSearch() {}
 
