@@ -59,7 +59,7 @@ class MazeGenerator {
         }
 
         if (this.generateStandardMaze(nextNode) == false) {
-            return this.generateStandardMaze(nextNode);
+            return this.generateStandardMaze(node);
         } else {
             return true;
         }
