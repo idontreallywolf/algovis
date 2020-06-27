@@ -17,6 +17,7 @@ class Visualizer {
         this.nodes = [];
 
         this.handTool = TOOL_EMPTYNODE;
+        this.currentMaze = null;
 
         this.selectedNode = null;
         this.previousNode = null;
@@ -213,6 +214,7 @@ class Visualizer {
     }
 
     generateMaze(type) {
+        this.currentMaze = type;
         this.clear();
         if(type == MAZE_BLOCK)
             this.fillWithObstacles();
@@ -224,8 +226,8 @@ class Visualizer {
         this.freeVisitedPaths();
 
         let pf = new PathFinder(this.nodes, this.pathStack);
-        pf.depthFirstSearch(this.targetPoints[0]);
-        
+        pf.depthFirstSearch(this.targetPoints[0], this.currentMaze);
+
         if(this.pathStack == false) {
             console.log("no path");
             return;

@@ -4,9 +4,9 @@ class PathFinder {
         this.stack = stack;
     }
 
-    depthFirstSearch(node) {
+    depthFirstSearch(node, mazeType) {
         node.setVisited(true);
-        let nextNode = this.findUnvisitedNode(node);
+        let nextNode = this.findUnvisitedNode(node, mazeType);
 
         if(nextNode == null) {
             let n = this.stack.pop();
@@ -20,14 +20,14 @@ class PathFinder {
         if(nextNode.isDestination)
             return this.stack;
 
-        if(this.depthFirstSearch(nextNode) == false) {
-            return this.depthFirstSearch(node);
+        if(this.depthFirstSearch(nextNode, mazeType) == false) {
+            return this.depthFirstSearch(node, mazeType);
         } else {
             return this.stack;
         }
     }
 
-    findUnvisitedNode(node) {
+    findUnvisitedNode(node, mazeType) {
         let dy = [-1, 1,  0, 0];
         let dx = [ 0, 0, -1, 1];
 
@@ -42,8 +42,43 @@ class PathFinder {
 
             let tempNode = this.nodes[node.y + dy[i]][node.x + dx[i]];
 
-            if(tempNode.isVisited() == false)
-                freeNodes.push(tempNode);
+            if(tempNode.isVisited() == false) {
+                if(mazeType == MAZE_BLOCK) {
+                    freeNodes.push(tempNode);
+                    continue;
+                }
+
+                if(mazeType == MAZE_STANDARD) {
+                    if(tempNode.y < node.y) {
+                        if(node.edges.top == false && tempNode.edges.bottom == false) {
+                            freeNodes.push(tempNode);
+                            continue;
+                        }
+                    // DOWN
+                    } else if(tempNode.y > node.y) {
+                        if(node.edges.bottom == false && tempNode.edges.top == false){
+                            freeNodes.push(tempNode);
+                            continue;
+                        }
+                    }
+
+                    // LEFT
+                    if(tempNode.x < node.x) {
+                        if(node.edges.left == false && tempNode.edges.right == false) {
+                            freeNodes.push(tempNode);
+                            continue;
+                        }
+                    }
+
+                    // RIGHT
+                    else if(tempNode.x > node.x) {
+                        if(node.edges.right == false && tempNode.edges.left == false) {
+                            freeNodes.push(tempNode);
+                            continue;
+                        }
+                    }
+                }
+            }
         }
 
         if (freeNodes.length == 0)
