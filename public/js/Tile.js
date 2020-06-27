@@ -5,13 +5,15 @@ class Tile {
         @param {Number} y
         @param {bool}   isObstacle
     */
-    constructor(id, x, y, isObstacle) {
+    constructor(id, x, y, isObstacle, tileSize) {
         // unique id
         this.id = id;
 
+        this.parentNode = null;
+
         // dimensions
-        this.width = TILESIZE;
-        this.height = TILESIZE;
+        this.width = tileSize;
+        this.height = tileSize;
 
         // position in _nodes_ array
         this.x = x;
@@ -19,8 +21,8 @@ class Tile {
 
         // position on grid
         this.gridPos = {
-            x: x * TILESIZE,
-            y: y * TILESIZE
+            x: x * tileSize,
+            y: y * tileSize
         };
 
         this.isObstacle = isObstacle;

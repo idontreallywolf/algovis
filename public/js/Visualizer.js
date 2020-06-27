@@ -14,6 +14,7 @@ class Visualizer {
         this.isWeighted = weighted;
         this.mouseDown  = false;
 
+        this.tileSize = TILESIZE_DEFAULT;
         this.nodes = [];
 
         this.handTool = TOOL_EMPTYNODE;
@@ -30,6 +31,8 @@ class Visualizer {
 
         this.pathStack = [];
 
+        this.animationFrameId = null;
+
         this.canvasEventHandler();
         this.createNodes();
 
@@ -39,7 +42,7 @@ class Visualizer {
 
     render() {
         this.drawGrid();
-        window.requestAnimationFrame(() => this.render());
+        this.animationFrameId = window.requestAnimationFrame(() => this.render());
     }
 
     canvasEventHandler() {
@@ -132,8 +135,8 @@ class Visualizer {
     }
 
     getNodeByMousePos(event) {
-        let x = Math.floor(event.offsetX / TILESIZE);
-        let y = Math.floor(event.offsetY / TILESIZE);
+        let x = Math.floor(event.offsetX / this.tileSize);
+        let y = Math.floor(event.offsetY / this.tileSize);
         if (this.nodes[y] === undefined)
             return;
         return this.nodes[y][x];
@@ -146,18 +149,19 @@ class Visualizer {
         @param directed
         @param weighted
     */
-    createNodes() {
-        for (let i = 0; i < Math.floor(this.canvas.clientHeight / TILESIZE); i++) {
+    createNodes(firstCall = true) {
+        for (let i = 0; i < Math.floor(this.canvas.clientHeight / this.tileSize); i++) {
             let row = []
 
-            for (let j = 0; j < Math.floor(this.canvas.clientWidth / TILESIZE); j++)
-                row.push(new Tile(++this.lastNodeId, j, i, Math.random() >= 0.9));
+            for (let j = 0; j < Math.floor(this.canvas.clientWidth / this.tileSize); j++)
+                row.push(new Tile(++this.lastNodeId, j, i, false/*Math.random() >= 0.9*/, this.tileSize));
 
             this.nodes.push(row);
         }
 
         this.drawGrid();
-        this.render();
+        if(firstCall)
+            this.render();
     }
 
     drawGrid() {
@@ -168,7 +172,7 @@ class Visualizer {
         for (var i = 0; i < this.nodes.length; i++) {
             for (var j = 0; j < this.nodes[0].length; j++) {
                 this.ctx.fillStyle = this.nodes[i][j].bg;
-                this.ctx.fillRect(j * TILESIZE, i * TILESIZE, TILESIZE, TILESIZE)
+                this.ctx.fillRect(j * this.tileSize, i * this.tileSize, this.tileSize, this.tileSize)
                 this.nodes[i][j].drawEdges(this.ctx);
             }
         }
@@ -177,11 +181,11 @@ class Visualizer {
         this.ctx.lineWidth = 5;
         if(this.selectedNode !== null) {
             this.ctx.strokeStyle = NODE_COLOR_HIGHLIGHT;
-            this.ctx.rect(this.selectedNode.gridPos.x, this.selectedNode.gridPos.y, TILESIZE, TILESIZE);
+            this.ctx.rect(this.selectedNode.gridPos.x, this.selectedNode.gridPos.y, this.tileSize, this.tileSize);
         }
         if(this.previousNode !== null) {
             this.ctx.strokeStyle = NODE_COLOR_HIGHLIGHT;
-            this.ctx.rect(this.previousNode.gridPos.x, this.previousNode.gridPos.y, TILESIZE, TILESIZE);
+            this.ctx.rect(this.previousNode.gridPos.x, this.previousNode.gridPos.y, this.tileSize, this.tileSize);
         }
         this.ctx.stroke();
     }
@@ -246,11 +250,11 @@ class Visualizer {
     }
 
     clearNode(n) {
-        this.nodes[n.y][n.x] = new Tile(++this.lastNodeId, n.x, n.y, false);
+        this.nodes[n.y][n.x] = new Tile(++this.lastNodeId, n.x, n.y, false, this.tileSize);
     }
 
     restoreNode(n) {
-        let node = new Tile(++this.lastNodeId, n.x, n.y, false);
+        let node = new Tile(++this.lastNodeId, n.x, n.y, false, this.tileSize);
 
         node.isObstacle = n.isObstacle;
         node.isDestination = n.isDestination;
@@ -268,5 +272,12 @@ class Visualizer {
                 if(this.nodes[i][j].isObstacle)
                     this.nodes[i][j].setVisited(true);
             }
+    }
+
+    setTileSize(s) {
+        this.tileSize = s;
+        this.nodes = [];
+        this.createNodes(false);
+        this.drawGrid();
     }
 }
