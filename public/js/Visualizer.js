@@ -234,21 +234,29 @@ class Visualizer {
         this.freeVisitedPaths();
 
         let pf = new PathFinder(this.nodes, this.pathStack);
-        // pf.breadthFirstSearch(this.targetPoints[0], this.currentMaze);
-        // console.log("finished");
-        pf.depthFirstSearch(this.targetPoints[0], this.currentMaze);
+        switch (algorithm) {
+            case PATH_FINDER_DFS:
+                pf.depthFirstSearch(this.targetPoints[0], this.currentMaze);
 
-        if(this.pathStack == false) {
-            console.log("no path");
-            return;
+                if(this.pathStack == false) {
+                    console.log("no path");
+                    return;
+                }
+
+                for (var i = 0; i < this.pathStack.length; i++) {
+                    let node = this.pathStack[i];
+                    node.setBackground(NODE_COLOR_PATH);
+                }
+
+                this.pathStack = [];
+                break;
+            case PATH_FINDER_BFS:
+                pf.breadthFirstSearch(this.targetPoints[0], this.currentMaze);
+                break;
+            default:
+                console.log("[Visualizer Error] Unknown algorithm.");
+                break;
         }
-
-        for (var i = 0; i < this.pathStack.length; i++) {
-            let node = this.pathStack[i];
-            node.setBackground(NODE_COLOR_PATH);
-        }
-
-        this.pathStack = [];
     }
 
     setHandTool(tool) {

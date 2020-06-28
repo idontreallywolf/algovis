@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
     $('#mazegen_block').click(()    => { visualizer.generateMaze(MAZE_BLOCK);    });
 
     $('#pathfind_dfs').click(()     => { visualizer.findPath(PATH_FINDER_DFS);   });
-    $('#pathfind_bfs').click(()     => { visualizer.findPath(PATH_FINDER_DFS);   });
+    $('#pathfind_bfs').click(()     => { visualizer.findPath(PATH_FINDER_BFS);   });
 
     $("#tileSize").on("input change", function(e) {
         console.log($(this).val(), 2 ** $(this).val());
