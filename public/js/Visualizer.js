@@ -249,9 +249,14 @@ class Visualizer {
                 }
 
                 this.pathStack = [];
+
                 break;
             case PATH_FINDER_BFS:
                 pf.breadthFirstSearch(this.targetPoints[0], this.currentMaze);
+                break;
+
+            case PATH_FINDER_ASTAR:
+                pf.aStarSearch(this.targetPoints[0], this.targetPoints[1]);
                 break;
             default:
                 console.log("[Visualizer Error] Unknown algorithm.");

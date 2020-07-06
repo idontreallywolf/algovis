@@ -136,7 +136,84 @@ class PathFinder {
         }
     }
 
-    aStarSearch() {}
+    aStarSearch(startNode, endNode) {
+        let open = [];
+        let closed = [];
+        const diagonalCost = 14; // sqrt(2) * 10
+        const normalCost   = 10; // sqrt(1) * 10
+
+        // add start node to the open queue
+        open.push(startNode);
+
+        while(open.length > 0) {
+
+            // find best node for the next step
+            let smallestFCost = 0;
+            for (var i = 0; i < open.length; i++) {
+                if(open[i].getCostF() < open[smallestFCost].getCostF())
+                    smallestFCost = i;
+            }
+
+            let node = open[smallestFCost];
+            node.setVisited(true);
+
+            // Remove from openList
+            for (var i = open.length-1; i >= 0; i--) {
+                if(open[i].equalTo(node)) {
+                    open.splice(i, 1);
+                    break;
+                }
+            }
+
+            let adjacentNodes = this.findUnvisitedNode(node, MAZE_BLOCK, true);
+            if (adjacentNodes == null) {
+                continue;
+            }
+
+            for (var i = 0; i < adjacentNodes.length; i++) {
+                let adjacentNode = adjacentNodes[i];
+                let moveCost = (adjacentNode.isDiagonalTo(node) ? diagonalCost : normalCost);
+
+                if(adjacentNode.hasParent() === false) {
+
+                    // Destination node reached ?
+                    if(adjacentNode.equalTo(endNode)) {
+                        endNode.setParent(node);
+                        open = [];
+                        break;
+                    }
+
+                    adjacentNode.setParent(node);
+                    adjacentNode.addCostG(moveCost);
+                    adjacentNode.setCostH(
+                        Math.floor(Math.abs(node.gridPos.x - adjacentNode.gridPos.x) / this.tileSize) +
+                        Math.floor(Math.abs(node.gridPos.y - adjacentNode.gridPos.y) / this.tileSize)
+                    )
+                    open.push(adjacentNode);
+                } else {
+
+                    // If moving from the current node to the next adjacent node ..
+                    // costs more than it would when moving from the starting node.
+                    // then we should look for another adjacent node.
+                    if(node.getCostG() + moveCost >= adjacentNode.getCostG())
+                        continue;
+
+                    // Otherwise update the node to become a 'child-node' ..
+                    // of the current node and recalculate G[, H values]
+                    adjacentNode.setParent(node);
+                    adjacentNode.setCostG(node.getCostG() + moveCost);
+                }
+            }
+        }
+
+        // backtrack to start node
+        let parentNode = endNode.getParent();
+        while(parentNode != null) {
+            parentNode.setBackground(NODE_COLOR_PATH);
+            parentNode = parentNode.getParent();
+        }
+    }
+
     dijkstraSearch() {}
 
 }

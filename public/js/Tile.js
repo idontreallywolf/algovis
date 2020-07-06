@@ -39,6 +39,9 @@ class Tile {
         }
 
         this.visited = false;
+
+        this.gCost = 0;
+        this.hCost = 0;
     }
 
     /**
@@ -166,5 +169,22 @@ class Tile {
 
     setParent(n) {
         this.parentNode = n;
+    }
+
+    getCostG() { return this.gCost;              }
+    getCostH() { return this.hCost;              }
+    getCostF() { return this.gCost + this.hCost; }
+
+    setCostG(amount) { this.gCost = amount; }
+    setCostH(amount) { this.hCost = amount; }
+
+    addCostG(amount) { this.gCost += amount; }
+    addCostH(amount) { this.hCost += amount; }
+
+    isDiagonalTo(node) {
+        return (node.x < this.x && node.y > this.y) || // TOP RIGHT
+               (node.x < this.x && node.y < this.y) || // BOTTOM RIGHT
+               (node.x > this.x && node.y > this.y) || // TOP LEFT
+               (node.x > this.x && node.y < this.y);   // BOTTOM LEFT
     }
 }

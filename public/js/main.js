@@ -14,6 +14,7 @@ window.addEventListener('load', () => {
 
     $('#pathfind_dfs').click(()     => { visualizer.findPath(PATH_FINDER_DFS);   });
     $('#pathfind_bfs').click(()     => { visualizer.findPath(PATH_FINDER_BFS);   });
+    $('#pathfind_astar').click(()     => { visualizer.findPath(PATH_FINDER_ASTAR);   });
 
     $("#tileSize").on("input change", function(e) {
         console.log($(this).val(), 2 ** $(this).val());
