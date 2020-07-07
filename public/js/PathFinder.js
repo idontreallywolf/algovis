@@ -147,6 +147,7 @@ class PathFinder {
                         return;
                     }
 
+                    childNodes[i].setBackground(NODE_COLOR_INQUEUE)
                     this.queue.push(childNodes[i]);
                 }
             }
