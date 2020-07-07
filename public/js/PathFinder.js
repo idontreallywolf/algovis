@@ -13,7 +13,7 @@ class PathFinder {
             let n = this.stack.pop();
             if(n !== undefined)
                 n.setBackground(NODE_COLOR_HIGHLIGHT);
-            node.setBackground(NODE_COLOR_HIGHLIGHT)
+            node.setBackground(NODE_COLOR_HIGHLIGHT);
             return false;
         }
 
