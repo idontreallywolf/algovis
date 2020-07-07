@@ -96,15 +96,21 @@ class PathFinder {
         this.queue.push(node);
         let childNodes = null;
 
-        while(this.queue.length > 0) {
+        //while(this.queue.length > 0) {
+        let searchLoop = setInterval(() => {
+            if(this.queue.length == 0) {
+                clearInterval(searchLoop);
+            }
+
             node = this.queue[0];
             node.setVisited(true);
+            node.setBackground(NODE_COLOR_VISITED);
 
             childNodes = this.findUnvisitedNode(node, mazeType, true);
 
             if(childNodes == null) {
                 this.queue.shift();
-                continue;
+                return;
             }
 
             for (var i = 0; i < childNodes.length; i++) {
@@ -113,7 +119,18 @@ class PathFinder {
 
                     if (childNodes[i].isDestination) {
                         backtrackNode = childNodes[i];
-                        break;
+
+                        let parentNode = backtrackNode.getParent();
+
+                        let backTrackInterval = setInterval(() => {
+                            parentNode.setBackground(NODE_COLOR_PATH);
+                            parentNode = parentNode.getParent();
+                            if(parentNode == null)
+                                clearInterval(backTrackInterval);
+                        }, 10);
+
+                        clearInterval(searchLoop);
+                        return;
                     }
 
                     this.queue.push(childNodes[i]);
@@ -122,18 +139,10 @@ class PathFinder {
 
             // destination node found, exit loop.
             if(backtrackNode != null)
-                break;
+                return;
 
             this.queue.shift();
-        }
-
-        if(backtrackNode != null) {
-            let parentNode = backtrackNode.getParent();
-            while(parentNode != null) {
-                parentNode.setBackground(NODE_COLOR_PATH);
-                parentNode = parentNode.getParent();
-            }
-        }
+        }, 10);
     }
 
     aStarSearch(startNode, endNode) {
