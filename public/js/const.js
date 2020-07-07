@@ -3,6 +3,7 @@ const NODE_COLOR_EMPTY       = "#fff";
 const NODE_COLOR_DESTINATION = "#0f0";
 const NODE_COLOR_HIGHLIGHT   = "#f00";
 const NODE_COLOR_PATH        = "#a8008e";
+const NODE_COLOR_VISITED     = "#734473";
 
 // handTool
 const TOOL_EMPTYNODE    = 0;
