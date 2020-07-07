@@ -6,27 +6,41 @@ class PathFinder {
     }
 
     depthFirstSearch(node, mazeType) {
-        node.setVisited(true);
-        let nextNode = this.findUnvisitedNode(node, mazeType);
+        let promise = new Promise((resolve, reject) => {
+            setTimeout(() => {
+                node.setVisited(true);
+                node.setBackground(NODE_COLOR_VISITED);
+                let nextNode = this.findUnvisitedNode(node, mazeType);
 
-        if(nextNode == null) {
-            let n = this.stack.pop();
-            if(n !== undefined)
-                n.setBackground(NODE_COLOR_HIGHLIGHT);
-            node.setBackground(NODE_COLOR_HIGHLIGHT);
-            return false;
-        }
+                if(nextNode == null) {
+                    let n = this.stack.pop();
+                    if(n !== undefined)
+                    n.setBackground(NODE_COLOR_HIGHLIGHT);
+                    node.setBackground(NODE_COLOR_HIGHLIGHT);
+                    resolve(false);
+                    return;
+                }
 
-        this.stack.push(node);
+                this.stack.push(node);
 
-        if(nextNode.isDestination)
-            return this.stack;
+                if(nextNode.isDestination) {
+                    resolve(this.stack);
+                    return;
+                }
 
-        if(this.depthFirstSearch(nextNode, mazeType) == false) {
-            return this.depthFirstSearch(node, mazeType);
-        } else {
-            return this.stack;
-        }
+                this.depthFirstSearch(nextNode, mazeType).then((res) => {
+                    if(res == false) {
+                        resolve(this.depthFirstSearch(node, mazeType));
+                        return;
+                    } else {
+                        resolve(this.stack);
+                        return;
+                    }
+                });
+            }, 10);
+        });
+        
+        return promise;
     }
 
     findUnvisitedNode(node, mazeType = MAZE_BLOCK, returnAll = false) {

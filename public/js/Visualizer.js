@@ -236,21 +236,35 @@ class Visualizer {
         let pf = new PathFinder(this.nodes, this.pathStack);
         switch (algorithm) {
             case PATH_FINDER_DFS:
-                pf.depthFirstSearch(this.targetPoints[0], this.currentMaze);
+            {
 
-                if(this.pathStack == false) {
-                    console.log("no path");
-                    return;
-                }
+                pf.depthFirstSearch(this.targetPoints[0], this.currentMaze)
+                .then(() => {
+                    if(this.pathStack == false) {
+                        console.log("no path");
+                        return;
+                    }
 
-                for (var i = 0; i < this.pathStack.length; i++) {
-                    let node = this.pathStack[i];
-                    node.setBackground(NODE_COLOR_PATH);
-                }
+                    // Backtrack
+                    let i = 0;
+                    let backTrackDfs = setInterval(() => {
 
-                this.pathStack = [];
+                        let node = this.pathStack[i];
+                        node.setBackground(NODE_COLOR_PATH);
 
-                break;
+                        i++;
+                        if(i == this.pathStack.length-1) {
+                            this.pathStack = [];
+                            clearInterval(backTrackDfs);
+                        }
+
+                    }, 10);
+
+                });
+
+
+            } break;
+
             case PATH_FINDER_BFS:
                 pf.breadthFirstSearch(this.targetPoints[0], this.currentMaze);
                 break;
