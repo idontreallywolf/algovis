@@ -90,8 +90,8 @@ class Visualizer {
 
             switch(this.handTool) {
                 case TOOL_EMPTYNODE:
-                    if(node.isObstacle)    node.makeObstacle(false);
-                    if(node.isDestination) node.makeDestination(false);
+                    node.reset();
+
                     break;
 
                 case TOOL_OBSTACLE:
@@ -197,13 +197,8 @@ class Visualizer {
         this.targets = 0;
 
         for (var i = 0; i < this.nodes.length; i++)
-            for (var j = 0; j < this.nodes[0].length; j++) {
-                let n = this.nodes[i][j];
-                n.makeEmpty();
-                n.setVisited(false);
-                n.resetEdges();
-                n.setParent(null);
-            }
+            for (var j = 0; j < this.nodes[0].length; j++)
+                this.nodes[i][j].reset();
     }
 
     generateObstacles() {

@@ -20,4 +20,41 @@ window.addEventListener('load', () => {
         console.log($(this).val(), 2 ** $(this).val());
         visualizer.setTileSize(2 ** parseInt($(this).val()));
     });
+
+    function binaryFind(searchElement) {
+        'use strict';
+
+        var minIndex = 0;
+        var maxIndex = this.length - 1;
+        var currentIndex = 0;
+        var currentElement = null;
+
+        console.log(minIndex, maxIndex, minIndex <= maxIndex);
+        while (minIndex <= maxIndex) {
+            currentIndex = (minIndex + maxIndex) / 2 | 0;
+            currentElement = this[currentIndex];
+
+            if (currentElement.getCostF() < searchElement.getCostF()) {
+                minIndex = currentIndex + 1;
+            } else if (currentElement.getCostF() > searchElement.getCostF()) {
+                maxIndex = currentIndex - 1;
+            } else {
+                return { // Modification
+                    found: true,
+                    index: currentIndex
+                };
+            }
+        }
+
+        return { // Modification
+            found: false,
+            index: currentElement == null ? 0 : (currentElement.getCostF() < searchElement.getCostF() ? currentIndex + 1 : currentIndex)
+        };
+    }
+
+    Array.prototype.binaryFind = binaryFind;
+    Array.prototype.addSorted = function(element) {
+        var res = this.binaryFind(element);
+        if (!res.found) this.splice(res.index, 0, element);
+    }
 });

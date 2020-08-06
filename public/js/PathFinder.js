@@ -10,7 +10,7 @@ class PathFinder {
             setTimeout(() => {
                 node.setVisited(true);
                 node.setBackground(NODE_COLOR_VISITED);
-                let nextNode = this.findUnvisitedNode(node, mazeType);
+                let nextNode = this.findUnvisitedNode(node, mazeType, false, false);
 
                 if(nextNode == null) {
                     let n = this.stack.pop();
@@ -39,13 +39,18 @@ class PathFinder {
                 });
             }, 10);
         });
-        
+
         return promise;
     }
 
-    findUnvisitedNode(node, mazeType = MAZE_BLOCK, returnAll = false) {
+    findUnvisitedNode(node, mazeType = MAZE_BLOCK, returnAll = false, allowDiagonal = false) {
         let dy = [-1, 1,  0, 0];
         let dx = [ 0, 0, -1, 1];
+
+        if(allowDiagonal) {
+            dy = dy.concat([-1, -1,  1, 1]);
+            dx = dx.concat([-1,  1, -1, 1]);
+        }
 
         let freeNodes = [];
 
@@ -120,7 +125,7 @@ class PathFinder {
             node.setVisited(true);
             node.setBackground(NODE_COLOR_VISITED);
 
-            childNodes = this.findUnvisitedNode(node, mazeType, true);
+            childNodes = this.findUnvisitedNode(node, mazeType, true, false);
 
             if(childNodes == null) {
                 this.queue.shift();
@@ -161,40 +166,54 @@ class PathFinder {
     }
 
     aStarSearch(startNode, endNode) {
+
+        // create an open list
         let open = [];
-        let closed = [];
+
+        // movement costs
         const diagonalCost = 14; // sqrt(2) * 10
         const normalCost   = 10; // sqrt(1) * 10
 
-        // add start node to the open queue
+        // add starting node to the open queue
         open.push(startNode);
 
-        while(open.length > 0) {
+        // start the search
+        let aStarLoop = setInterval(() => {
 
-            // find best node for the next step
+            // when the list is empty, stop
+            if(open.length == 0) {
+                print("finished");
+                clearInterval(aStarLoop);
+                return;
+            }
+
+            // find smallest F cost
             let smallestFCost = 0;
             for (var i = 0; i < open.length; i++) {
                 if(open[i].getCostF() < open[smallestFCost].getCostF())
                     smallestFCost = i;
             }
 
-            let node = open[smallestFCost];
+            // fetch and mark current node.
+            let node = open[smallestFCost]; // open.shift();
             node.setVisited(true);
+            node.setBackground(NODE_COLOR_VISITED);
 
-            // Remove from openList
+            // Remove current node from openList
             for (var i = open.length-1; i >= 0; i--) {
-                if(open[i].equalTo(node)) {
+                if(node.equalTo(open[i])) {
                     open.splice(i, 1);
                     break;
                 }
             }
 
-            let adjacentNodes = this.findUnvisitedNode(node, MAZE_BLOCK, true);
-            if (adjacentNodes == null) {
-                continue;
-            }
+            // fetch adjacent nodes
+            let adjacentNodes = this.findUnvisitedNode(node, MAZE_BLOCK, true, false);
+            if (adjacentNodes == null)
+                return;
 
-            for (var i = 0; i < adjacentNodes.length; i++) {
+            // process adjacent nodes
+            for (let i = 0; i < adjacentNodes.length; i++) {
                 let adjacentNode = adjacentNodes[i];
                 let moveCost = (adjacentNode.isDiagonalTo(node) ? diagonalCost : normalCost);
 
@@ -204,15 +223,33 @@ class PathFinder {
                     if(adjacentNode.equalTo(endNode)) {
                         endNode.setParent(node);
                         open = [];
-                        break;
+
+                        // backtrack to start node
+                        let parentNode = endNode.getParent();
+                        let backTrackInterval = setInterval(() => {
+                            parentNode.setBackground(NODE_COLOR_PATH);
+                            parentNode = parentNode.getParent();
+
+                            if(parentNode == null)
+                                clearInterval(backTrackInterval);
+
+                        }, 10);
+
+                        clearInterval(aStarLoop);
+                        return;
                     }
 
                     adjacentNode.setParent(node);
-                    adjacentNode.addCostG(moveCost);
+                    adjacentNode.setCostG(node.getCostG() + moveCost);
+
                     adjacentNode.setCostH(
-                        Math.floor(Math.abs(node.gridPos.x - adjacentNode.gridPos.x) / this.tileSize) +
-                        Math.floor(Math.abs(node.gridPos.y - adjacentNode.gridPos.y) / this.tileSize)
-                    )
+                        moveCost
+                      * (Math.abs(endNode.x - adjacentNode.x)
+                      + Math.abs(endNode.y - adjacentNode.y))
+                    );
+                    adjacentNode.setBackground(NODE_COLOR_INQUEUE);
+
+                    //open.addSorted(adjacentNode);
                     open.push(adjacentNode);
                 } else {
 
@@ -220,7 +257,7 @@ class PathFinder {
                     // costs more than it would when moving from the starting node.
                     // then we should look for another adjacent node.
                     if(node.getCostG() + moveCost >= adjacentNode.getCostG())
-                        continue;
+                        return;
 
                     // Otherwise update the node to become a 'child-node' ..
                     // of the current node and recalculate G[, H values]
@@ -228,14 +265,9 @@ class PathFinder {
                     adjacentNode.setCostG(node.getCostG() + moveCost);
                 }
             }
-        }
 
-        // backtrack to start node
-        let parentNode = endNode.getParent();
-        while(parentNode != null) {
-            parentNode.setBackground(NODE_COLOR_PATH);
-            parentNode = parentNode.getParent();
-        }
+
+        }, 10);
     }
 
     dijkstraSearch() {}
