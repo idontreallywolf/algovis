@@ -15,7 +15,8 @@ class PathFinder {
                 if(nextNode == null) {
                     let n = this.stack.pop();
                     if(n !== undefined)
-                    n.setBackground(NODE_COLOR_HIGHLIGHT);
+                        n.setBackground(NODE_COLOR_HIGHLIGHT);
+
                     node.setBackground(NODE_COLOR_HIGHLIGHT);
                     resolve(false);
                     return;
