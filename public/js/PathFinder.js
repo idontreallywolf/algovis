@@ -208,7 +208,6 @@ class PathFinder {
                     // Destination node reached ?
                     if(adjacentNode.equalTo(endNode)) {
                         endNode.setParent(node);
-                        //open = [];
 
                         // backtrack to start node
                         let parentNode = endNode.getParent();
@@ -239,8 +238,6 @@ class PathFinder {
                     );
 
                     adjacentNode.setBackground(NODE_COLOR_INQUEUE);
-
-                    //open.push(adjacentNode);
                     pq.add(adjacentNode);
                 } else {
 
