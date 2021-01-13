@@ -90,8 +90,8 @@ class Visualizer {
 
             switch(this.handTool) {
                 case TOOL_EMPTYNODE:
-                    if(node.isObstacle)    node.makeObstacle(false);
-                    if(node.isDestination) node.makeDestination(false);
+                    node.reset();
+
                     break;
 
                 case TOOL_OBSTACLE:
@@ -197,19 +197,15 @@ class Visualizer {
         this.targets = 0;
 
         for (var i = 0; i < this.nodes.length; i++)
-            for (var j = 0; j < this.nodes[0].length; j++) {
-                let n = this.nodes[i][j];
-                n.makeEmpty();
-                n.setVisited(false);
-                n.resetEdges();
-                n.setParent(null);
-            }
+            for (var j = 0; j < this.nodes[0].length; j++)
+                this.nodes[i][j].reset();
     }
 
     generateObstacles() {
+        this.clear();
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++)
-                this.nodes[i][j].makeObstacle(Math.random() >= 0.9);
+                this.nodes[i][j].makeObstacle(Math.random() >= 0.8);
     }
 
     fillWithObstacles() {
@@ -236,21 +232,35 @@ class Visualizer {
         let pf = new PathFinder(this.nodes, this.pathStack);
         switch (algorithm) {
             case PATH_FINDER_DFS:
-                pf.depthFirstSearch(this.targetPoints[0], this.currentMaze);
+            {
 
-                if(this.pathStack == false) {
-                    console.log("no path");
-                    return;
-                }
+                pf.depthFirstSearch(this.targetPoints[0], this.currentMaze)
+                .then(() => {
+                    if(this.pathStack == false) {
+                        console.log("no path");
+                        return;
+                    }
 
-                for (var i = 0; i < this.pathStack.length; i++) {
-                    let node = this.pathStack[i];
-                    node.setBackground(NODE_COLOR_PATH);
-                }
+                    // Backtrack
+                    let i = 0;
+                    let backTrackDfs = setInterval(() => {
 
-                this.pathStack = [];
+                        let node = this.pathStack[i];
+                        node.setBackground(NODE_COLOR_PATH);
 
-                break;
+                        i++;
+                        if(i == this.pathStack.length-1) {
+                            this.pathStack = [];
+                            clearInterval(backTrackDfs);
+                        }
+
+                    }, 10);
+
+                });
+
+
+            } break;
+
             case PATH_FINDER_BFS:
                 pf.breadthFirstSearch(this.targetPoints[0], this.currentMaze);
                 break;

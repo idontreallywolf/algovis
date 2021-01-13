@@ -14,6 +14,7 @@ class Tile {
         // dimensions
         this.width = tileSize;
         this.height = tileSize;
+        this.tileSize = tileSize;
 
         // position in _nodes_ array
         this.x = x;
@@ -44,6 +45,25 @@ class Tile {
         this.hCost = 0;
     }
 
+    reset() {
+        this.parentNode = null;
+
+        this.isObstacle = false;
+        this.isDestination = false;
+
+        this.bg = NODE_COLOR_EMPTY;
+
+        this.edges.top = true;
+        this.edges.left = true;
+        this.edges.bottom = true;
+        this.edges.right = true;
+
+        this.gCost = 0;
+        this.hCost = 0;
+
+        this.visited = false;
+    }
+
     /**
         An edgy function, draws edges :<<
         @param ctx - canvas context (2D)
@@ -69,6 +89,32 @@ class Tile {
 
         ctx.strokeStyle = "#000";
         ctx.stroke();
+        // this.viewCost(ctx);
+    }
+
+    viewCost(ctx) {
+        ctx.beginPath();
+        ctx.font="11px Comic Sans MS";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+
+        ctx.fillText(
+            this.getCostF(),
+            this.gridPos.x + (this.tileSize / 2),
+            this.gridPos.y + (this.tileSize / 2) - 10
+        );
+
+        ctx.fillText(
+            this.getCostG(),
+            this.gridPos.x + 20,
+            this.gridPos.y + (this.tileSize)-10
+        );
+
+        ctx.fillText(
+            this.getCostH(),
+            this.gridPos.x + (this.tileSize)-20,
+            this.gridPos.y + (this.tileSize)-10
+        );
     }
 
     /**

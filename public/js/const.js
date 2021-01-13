@@ -4,6 +4,7 @@ const NODE_COLOR_DESTINATION = "#0f0";
 const NODE_COLOR_HIGHLIGHT   = "#f00";
 const NODE_COLOR_PATH        = "#a8008e";
 const NODE_COLOR_VISITED     = "#734473";
+const NODE_COLOR_INQUEUE     = "#1ba5cf";
 
 // handTool
 const TOOL_EMPTYNODE    = 0;

@@ -6,32 +6,51 @@ class PathFinder {
     }
 
     depthFirstSearch(node, mazeType) {
-        node.setVisited(true);
-        let nextNode = this.findUnvisitedNode(node, mazeType);
+        let promise = new Promise((resolve, reject) => {
+            setTimeout(() => {
+                node.setVisited(true);
+                node.setBackground(NODE_COLOR_VISITED);
+                let nextNode = this.findUnvisitedNode(node, mazeType, false, false);
 
-        if(nextNode == null) {
-            let n = this.stack.pop();
-            if(n !== undefined)
-                n.setBackground(NODE_COLOR_HIGHLIGHT);
-            node.setBackground(NODE_COLOR_HIGHLIGHT);
-            return false;
-        }
+                if(nextNode == null) {
+                    let n = this.stack.pop();
+                    if(n !== undefined)
+                    n.setBackground(NODE_COLOR_HIGHLIGHT);
+                    node.setBackground(NODE_COLOR_HIGHLIGHT);
+                    resolve(false);
+                    return;
+                }
 
-        this.stack.push(node);
+                this.stack.push(node);
 
-        if(nextNode.isDestination)
-            return this.stack;
+                if(nextNode.isDestination) {
+                    resolve(this.stack);
+                    return;
+                }
 
-        if(this.depthFirstSearch(nextNode, mazeType) == false) {
-            return this.depthFirstSearch(node, mazeType);
-        } else {
-            return this.stack;
-        }
+                this.depthFirstSearch(nextNode, mazeType).then((res) => {
+                    if(res == false) {
+                        resolve(this.depthFirstSearch(node, mazeType));
+                        return;
+                    } else {
+                        resolve(this.stack);
+                        return;
+                    }
+                });
+            }, 10);
+        });
+
+        return promise;
     }
 
-    findUnvisitedNode(node, mazeType = MAZE_BLOCK, returnAll = false) {
+    findUnvisitedNode(node, mazeType = MAZE_BLOCK, returnAll = false, allowDiagonal = false) {
         let dy = [-1, 1,  0, 0];
         let dx = [ 0, 0, -1, 1];
+
+        if(allowDiagonal) {
+            dy = dy.concat([-1, -1,  1, 1]);
+            dx = dx.concat([-1,  1, -1, 1]);
+        }
 
         let freeNodes = [];
 
@@ -96,15 +115,21 @@ class PathFinder {
         this.queue.push(node);
         let childNodes = null;
 
-        while(this.queue.length > 0) {
+        //while(this.queue.length > 0) {
+        let searchLoop = setInterval(() => {
+            if(this.queue.length == 0) {
+                clearInterval(searchLoop);
+            }
+
             node = this.queue[0];
             node.setVisited(true);
+            node.setBackground(NODE_COLOR_VISITED);
 
-            childNodes = this.findUnvisitedNode(node, mazeType, true);
+            childNodes = this.findUnvisitedNode(node, mazeType, true, false);
 
             if(childNodes == null) {
                 this.queue.shift();
-                continue;
+                return;
             }
 
             for (var i = 0; i < childNodes.length; i++) {
@@ -113,64 +138,68 @@ class PathFinder {
 
                     if (childNodes[i].isDestination) {
                         backtrackNode = childNodes[i];
-                        break;
+
+                        let parentNode = backtrackNode.getParent();
+
+                        let backTrackInterval = setInterval(() => {
+                            parentNode.setBackground(NODE_COLOR_PATH);
+                            parentNode = parentNode.getParent();
+                            if(parentNode == null)
+                                clearInterval(backTrackInterval);
+                        }, 10);
+
+                        clearInterval(searchLoop);
+                        return;
                     }
 
+                    childNodes[i].setBackground(NODE_COLOR_INQUEUE)
                     this.queue.push(childNodes[i]);
                 }
             }
 
             // destination node found, exit loop.
             if(backtrackNode != null)
-                break;
+                return;
 
             this.queue.shift();
-        }
-
-        if(backtrackNode != null) {
-            let parentNode = backtrackNode.getParent();
-            while(parentNode != null) {
-                parentNode.setBackground(NODE_COLOR_PATH);
-                parentNode = parentNode.getParent();
-            }
-        }
+        }, 10);
     }
 
     aStarSearch(startNode, endNode) {
-        let open = [];
-        let closed = [];
+        console.log(Math.abs(startNode.x - endNode.x), Math.abs(startNode.y - endNode.y));
+        // animation animationSpeed ( ms )
+        let animationSpeed = 1;
+
+        let pq = new priorityQueue((a, b) => a.getCostF() - b.getCostF());
+
+        // movement costs
         const diagonalCost = 14; // sqrt(2) * 10
         const normalCost   = 10; // sqrt(1) * 10
+        let deltaX, deltaY;
 
-        // add start node to the open queue
-        open.push(startNode);
+        // add starting node to the open queue
+        //open.push(startNode);
+        pq.add(startNode);
 
-        while(open.length > 0) {
+        // start the search
+        let aStarLoop = setInterval(() => {
 
-            // find best node for the next step
-            let smallestFCost = 0;
-            for (var i = 0; i < open.length; i++) {
-                if(open[i].getCostF() < open[smallestFCost].getCostF())
-                    smallestFCost = i;
+            if(pq.size == 0) {
+                clearInterval(aStarLoop);
+                return;
             }
 
-            let node = open[smallestFCost];
+            let node = pq.remove();
             node.setVisited(true);
+            node.setBackground(NODE_COLOR_VISITED);
 
-            // Remove from openList
-            for (var i = open.length-1; i >= 0; i--) {
-                if(open[i].equalTo(node)) {
-                    open.splice(i, 1);
-                    break;
-                }
-            }
+            // fetch adjacent nodes
+            let adjacentNodes = this.findUnvisitedNode(node, MAZE_BLOCK, true, false);
+            if (adjacentNodes == null)
+                return;
 
-            let adjacentNodes = this.findUnvisitedNode(node, MAZE_BLOCK, true);
-            if (adjacentNodes == null) {
-                continue;
-            }
-
-            for (var i = 0; i < adjacentNodes.length; i++) {
+            // process adjacent nodes
+            for (let i = 0; i < adjacentNodes.length; i++) {
                 let adjacentNode = adjacentNodes[i];
                 let moveCost = (adjacentNode.isDiagonalTo(node) ? diagonalCost : normalCost);
 
@@ -179,24 +208,47 @@ class PathFinder {
                     // Destination node reached ?
                     if(adjacentNode.equalTo(endNode)) {
                         endNode.setParent(node);
-                        open = [];
-                        break;
+                        //open = [];
+
+                        // backtrack to start node
+                        let parentNode = endNode.getParent();
+                        let backTrackInterval = setInterval(() => {
+                            parentNode.setBackground(NODE_COLOR_PATH);
+                            parentNode = parentNode.getParent();
+
+                            if(parentNode == null)
+                                clearInterval(backTrackInterval);
+
+                        }, animationSpeed);
+
+                        clearInterval(aStarLoop);
+                        return;
                     }
 
                     adjacentNode.setParent(node);
-                    adjacentNode.addCostG(moveCost);
+                    adjacentNode.setCostG(node.getCostG() + moveCost);
+
+                    // calculate heuristics
+                    deltaX = Math.abs(endNode.x - adjacentNode.x);
+                    deltaY = Math.abs(endNode.y - adjacentNode.y);
+
                     adjacentNode.setCostH(
-                        Math.floor(Math.abs(node.gridPos.x - adjacentNode.gridPos.x) / this.tileSize) +
-                        Math.floor(Math.abs(node.gridPos.y - adjacentNode.gridPos.y) / this.tileSize)
-                    )
-                    open.push(adjacentNode);
+                        moveCost * (deltaX + deltaY)
+                        // (diagonalCost/2) * Math.min(deltaX,deltaY) +
+                        // 10 * (Math.max(deltaX,deltaY) - Math.min(deltaX,deltaY))
+                    );
+
+                    adjacentNode.setBackground(NODE_COLOR_INQUEUE);
+
+                    //open.push(adjacentNode);
+                    pq.add(adjacentNode);
                 } else {
 
                     // If moving from the current node to the next adjacent node ..
                     // costs more than it would when moving from the starting node.
                     // then we should look for another adjacent node.
                     if(node.getCostG() + moveCost >= adjacentNode.getCostG())
-                        continue;
+                        return;
 
                     // Otherwise update the node to become a 'child-node' ..
                     // of the current node and recalculate G[, H values]
@@ -204,14 +256,9 @@ class PathFinder {
                     adjacentNode.setCostG(node.getCostG() + moveCost);
                 }
             }
-        }
 
-        // backtrack to start node
-        let parentNode = endNode.getParent();
-        while(parentNode != null) {
-            parentNode.setBackground(NODE_COLOR_PATH);
-            parentNode = parentNode.getParent();
-        }
+
+        }, 0);
     }
 
     dijkstraSearch() {}
