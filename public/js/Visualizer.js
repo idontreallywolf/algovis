@@ -202,9 +202,10 @@ class Visualizer {
     }
 
     generateObstacles() {
+        this.clear();
         for (var i = 0; i < this.nodes.length; i++)
             for (var j = 0; j < this.nodes[0].length; j++)
-                this.nodes[i][j].makeObstacle(Math.random() >= 0.9);
+                this.nodes[i][j].makeObstacle(Math.random() >= 0.8);
     }
 
     fillWithObstacles() {

@@ -166,46 +166,32 @@ class PathFinder {
     }
 
     aStarSearch(startNode, endNode) {
+        console.log(Math.abs(startNode.x - endNode.x), Math.abs(startNode.y - endNode.y));
+        // animation animationSpeed ( ms )
+        let animationSpeed = 1;
 
-        // create an open list
-        let open = [];
+        let pq = new priorityQueue((a, b) => a.getCostF() - b.getCostF());
 
         // movement costs
         const diagonalCost = 14; // sqrt(2) * 10
         const normalCost   = 10; // sqrt(1) * 10
+        let deltaX, deltaY;
 
         // add starting node to the open queue
-        open.push(startNode);
+        //open.push(startNode);
+        pq.add(startNode);
 
         // start the search
         let aStarLoop = setInterval(() => {
 
-            // when the list is empty, stop
-            if(open.length == 0) {
-                print("finished");
+            if(pq.size == 0) {
                 clearInterval(aStarLoop);
                 return;
             }
 
-            // find smallest F cost
-            let smallestFCost = 0;
-            for (var i = 0; i < open.length; i++) {
-                if(open[i].getCostF() < open[smallestFCost].getCostF())
-                    smallestFCost = i;
-            }
-
-            // fetch and mark current node.
-            let node = open[smallestFCost]; // open.shift();
+            let node = pq.remove();
             node.setVisited(true);
             node.setBackground(NODE_COLOR_VISITED);
-
-            // Remove current node from openList
-            for (var i = open.length-1; i >= 0; i--) {
-                if(node.equalTo(open[i])) {
-                    open.splice(i, 1);
-                    break;
-                }
-            }
 
             // fetch adjacent nodes
             let adjacentNodes = this.findUnvisitedNode(node, MAZE_BLOCK, true, false);
@@ -222,7 +208,7 @@ class PathFinder {
                     // Destination node reached ?
                     if(adjacentNode.equalTo(endNode)) {
                         endNode.setParent(node);
-                        open = [];
+                        //open = [];
 
                         // backtrack to start node
                         let parentNode = endNode.getParent();
@@ -233,7 +219,7 @@ class PathFinder {
                             if(parentNode == null)
                                 clearInterval(backTrackInterval);
 
-                        }, 10);
+                        }, animationSpeed);
 
                         clearInterval(aStarLoop);
                         return;
@@ -242,15 +228,20 @@ class PathFinder {
                     adjacentNode.setParent(node);
                     adjacentNode.setCostG(node.getCostG() + moveCost);
 
+                    // calculate heuristics
+                    deltaX = Math.abs(endNode.x - adjacentNode.x);
+                    deltaY = Math.abs(endNode.y - adjacentNode.y);
+
                     adjacentNode.setCostH(
-                        moveCost
-                      * (Math.abs(endNode.x - adjacentNode.x)
-                      + Math.abs(endNode.y - adjacentNode.y))
+                        moveCost * (deltaX + deltaY)
+                        // (diagonalCost/2) * Math.min(deltaX,deltaY) +
+                        // 10 * (Math.max(deltaX,deltaY) - Math.min(deltaX,deltaY))
                     );
+
                     adjacentNode.setBackground(NODE_COLOR_INQUEUE);
 
-                    //open.addSorted(adjacentNode);
-                    open.push(adjacentNode);
+                    //open.push(adjacentNode);
+                    pq.add(adjacentNode);
                 } else {
 
                     // If moving from the current node to the next adjacent node ..
@@ -267,7 +258,7 @@ class PathFinder {
             }
 
 
-        }, 10);
+        }, 0);
     }
 
     dijkstraSearch() {}
