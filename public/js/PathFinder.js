@@ -118,9 +118,8 @@ class PathFinder {
 
         //while(this.queue.length > 0) {
         let searchLoop = setInterval(() => {
-            if(this.queue.length == 0) {
+            if(this.queue.length == 0)
                 clearInterval(searchLoop);
-            }
 
             node = this.queue[0];
             node.setVisited(true);
