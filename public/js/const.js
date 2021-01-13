@@ -27,4 +27,3 @@ const MAZE_BLOCK    = 1;
 const PATH_FINDER_DFS       = 0;
 const PATH_FINDER_BFS       = 1;
 const PATH_FINDER_ASTAR     = 2;
-const PATH_FINDER_DIJKSTRA  = 3;

@@ -257,7 +257,4 @@ class PathFinder {
 
         }, 0);
     }
-
-    dijkstraSearch() {}
-
 }
